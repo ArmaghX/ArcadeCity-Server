@@ -3,7 +3,7 @@ const router = express.Router();
 const createError = require("http-errors");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
-const User = require("../models/user.model");
+const Player = require("../models/player.model");
 
 // HELPER FUNCTIONS
 const {
@@ -14,9 +14,9 @@ const {
 
 // POST '/auth/signup'
 router.post('/signup', isNotLoggedIn, validationLogin, (req, res, next) => {
-  const { username, password } = req.body;
+  const { player, email, password } = req.body;
 
-  User.findOne({ username })
+  Player.findOne( {$or:[{player}, {email}]} )
     .then( (foundUser) => {
 
       if (foundUser) {
@@ -28,10 +28,10 @@ router.post('/signup', isNotLoggedIn, validationLogin, (req, res, next) => {
         const salt = bcrypt.genSaltSync(saltRounds);
         const encryptedPassword = bcrypt.hashSync(password, salt);
 
-        User.create( { username, password: encryptedPassword })
+        Player.create( { player, email, password: encryptedPassword })
           .then( (createdUser) => {
             // set the `req.session.currentUser` using newly created user object, to trigger creation of the session and cookie
-            createdUser.password = "*";
+            createdUser.password = "***";
             req.session.currentUser = createdUser; // automatically logs in the user by setting the session/cookie
 
             res
@@ -56,9 +56,9 @@ router.post('/signup', isNotLoggedIn, validationLogin, (req, res, next) => {
 
 // POST '/auth/login'
 router.post('/login', isNotLoggedIn, validationLogin, (req, res, next) => {
-  const { username, password } = req.body;
+  const { player, email, password } = req.body;
 
-  User.findOne({ username })
+  Player.findOne( {$or:[{player}, {email}]} )
     .then( (user) => {
       if (! user) {
         // If user with that username can't be found, respond with an error
