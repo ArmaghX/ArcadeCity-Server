@@ -5,12 +5,16 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const Player = require("../models/player.model");
 
+
+
 // HELPER FUNCTIONS
 const {
   isLoggedIn,
   isNotLoggedIn,
   validationLogin
 } = require("../helpers/middlewares");
+
+
 
 // POST '/auth/signup'
 router.post('/signup', isNotLoggedIn, validationLogin, (req, res, next) => {
@@ -51,9 +55,6 @@ router.post('/signup', isNotLoggedIn, validationLogin, (req, res, next) => {
 
 })
 
-
-
-
 // POST '/auth/login'
 router.post('/login', isNotLoggedIn, validationLogin, (req, res, next) => {
   const { player, email, password } = req.body;
@@ -87,7 +88,6 @@ router.post('/login', isNotLoggedIn, validationLogin, (req, res, next) => {
     });
 })
 
-
 // GET '/auth/logout'
 router.get('/logout',  isLoggedIn, (req, res, next) => {
   req.session.destroy( function(err){
@@ -101,17 +101,30 @@ router.get('/logout',  isLoggedIn, (req, res, next) => {
   } )
 })
 
-
-
 // GET '/auth/me'
-router.get('/me', isLoggedIn, (req, res, next) => {
-  const currentUserSessionData = req.session.currentUser;
 
-  res
-    .status(200)
-    .json(currentUserSessionData);
+// DELETE '/auth/me'
+router.delete('/me', isLoggedIn, (req, res, next) => {
 
-})
+  const currentUserId = req.session.currentUser._id.toString();
+  
+  Player.findByIdAndRemove(currentUserId, function(err){
+    if(err) {
+      return next(err);
+    }
+
+    req.session.destroy( function(err){
+      if (err) {
+        return next(err);
+      }
+
+    res
+      .status(202)
+      .json({message: 'User was deleted from the DB'});
+    })
+  })
+});
+
 
 
 module.exports = router;

@@ -18,9 +18,13 @@ const arcadeSchema = new Schema({
     address: String,
     city: String,
     comments: [{
-        type: String,
-        commentBy: {type: Schema.Types.ObjectId, ref:"Player"}
-        }]
+        comment: {type: String},
+        // commentBy: {type: Schema.Types.ObjectId, ref:"Player"}
+        }, {
+            timestamps: {
+                createdAt: 'created_at',
+                updatedAt: 'updated_at'
+            }}]
 }, {
     timestamps: {
         createdAt: 'created_at',
