@@ -1,12 +1,15 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const commentSchema = require('./sub-schemas/comment.schema');
+
+
 
 const arcadeSchema = new Schema({
     game: {type: String, required: true},
     description: String,
     maxPlayers: Number,
     isEmulated: Boolean,
-    rating: {type: Number, min: 0, max: 10},
+    rating: [{type: Number, min: 0, max: 10}],
     isActive: Boolean,
     coins: Number,
     yearReleased: Number,
@@ -17,19 +20,11 @@ const arcadeSchema = new Schema({
     contactInfo: String,
     address: String,
     city: String,
-    comments: [{
-        comment: {type: String},
-        // commentBy: {type: Schema.Types.ObjectId, ref:"Player"}
-        }, {
-            timestamps: {
-                createdAt: 'created_at',
-                updatedAt: 'updated_at'
-            }}]
+    comments: [ 
+        commentSchema
+     ]
 }, {
-    timestamps: {
-        createdAt: 'created_at',
-        updatedAt: 'updated_at'
-    },
+    timestamps: true,
 });
 
 const Arcade = mongoose.model('Arcade', arcadeSchema);

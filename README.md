@@ -167,7 +167,7 @@
      "player": { type: String, required: true},
      "email": {type: String, required: true},
      "password": {type: String, required: true},
-     "avatarImg": {type: File},
+     "avatarImg": String,
      "favourites": [{type: Schema.Types.ObjectId, ref:"Arcade"}],
      "hasFound": Boolean,
      "listedArcades": [{type: Schema.Types.ObjectId, ref:"Arcade"}],
@@ -181,37 +181,36 @@
 
 ```
 {	
-	"game": String,
+	  "game": {type: String, required: true},
     "description": String,
     "maxPlayers": Number,
     "isEmulated": Boolean,
-    "rating": Number,
+    "rating": [{type: Number, min: 0, max: 10}],
     "isActive": Boolean,
     "coins": Number,
     "yearReleased": Number,
     "highestScores": [{type: Schema.Types.ObjectId, ref:"HighestScore"}],
-    "gallery": [{type: File, required: true}],
+    "gallery": [{type: String, required: true}],
     "hunterId": {type: Schema.Types.ObjectId, ref:"Player"},
     "coordinates": [{type: Number}],
     "contactInfo": String,
     "address": String,
     "city": String,
-    "comments": [{
-    		"type": String,
-    		"commentBy": {type: Schema.Types.ObjectId, ref:"Player"}
-    		}]
+    "comments": [
+        commentSchema
+    ]
 }
 ```
 
 
 
-HighestScore Model
+**HighestScore Model**
 
 ```
 { 
  	"score": {type:Number, default: 0},
  	"arcade": {type: Schema.Types.ObjectId, ref:"Arcade"},
-    "scoredBy": {type: Schema.Types.ObjectId, ref:"Player"}
+  "scoredBy": {type: Schema.Types.ObjectId, ref:"Player"}
 }
 ```
 

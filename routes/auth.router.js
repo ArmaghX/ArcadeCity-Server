@@ -70,7 +70,7 @@ router.post('/login', isNotLoggedIn, validationLogin, (req, res, next) => {
 
       if (passwordIsValid) {
         // set the `req.session.currentUser`, to trigger creation of the session
-        user.password = "*";
+        user.password = "***";
         req.session.currentUser = user;
 
         res
@@ -100,30 +100,6 @@ router.get('/logout',  isLoggedIn, (req, res, next) => {
       .send();
   } )
 })
-
-// GET '/auth/me'
-
-// DELETE '/auth/me'
-router.delete('/me', isLoggedIn, (req, res, next) => {
-
-  const currentUserId = req.session.currentUser._id.toString();
-  
-  Player.findByIdAndRemove(currentUserId, function(err){
-    if(err) {
-      return next(err);
-    }
-
-    req.session.destroy( function(err){
-      if (err) {
-        return next(err);
-      }
-
-    res
-      .status(202)
-      .json({message: 'User was deleted from the DB'});
-    })
-  })
-});
 
 
 

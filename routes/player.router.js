@@ -14,28 +14,77 @@ const {
     validationLogin
   } = require("../helpers/middlewares");
 
+  
 
-
-
-    // GET '/api/player/me'
-
+    // GET '/api/player/me'       // WORKING
+      // Gets Current User Information (with Favs, ListedArcades and Rankings/Scores)
     router.get('/me', isLoggedIn, (req, res, next) => {
         const currentUserSessionData = req.session.currentUser;
-      
-        res
-          .status(200)
-          .json(currentUserSessionData);
-      
+
+      Player.findById(currentUserSessionData)
+            .populate('listedArcades')
+            .populate('rankings')
+            .populate('favourites')
+            .then((me) => {
+              me.password = "***";
+              res
+              .status(200)
+              .json(me);
+            })
       });
 
-    // GET '/api/player/me/scores'
-    router.get('/me/scores', isLoggedIn, (req, res, next) => {
-      const currentUserSessionData = req.session.currentUser;
 
+    // DELETE '/api/player/me'      // IN PROGRESS
+      // Erases Current User
+      // DON'T REMOVE LISTED ARCADES OR HIGHSCORES FROM DB BUT REMOVE PLAYER COMMENTS
+    router.delete('/me', isLoggedIn, (req, res, next) => {
+
+      const currentUserId = req.session.currentUser._id.toString();
+      
+      Player.findByIdAndRemove(currentUserId, function(err){
+        if(err) {
+          return next(err);
+        }
+
+        req.session.destroy( function(err){
+          if (err) {
+            return next(err);
+          }
+
+        res
+          .status(202)
+          .json({message: 'User was deleted from the DB'});
+        })
+      })
     });
 
-    // GET '/api/player/:player'
 
+    // PUT '/api/player/me/'
+      // Updates Current User Profile
+      router.put('/me', isLoggedIn, (req, res, next)=>{
+        const id = req.session.currentUser._id;
+        const { avatarImg } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+          res
+           .status(400)
+           .json({ message: 'Invalid Session: id not found' });
+          return;
+        }
+        User.findByIdAndUpdate(id, { avatarImg }, {new: true})
+          .then((updatedUser) => {
+            res
+             .status(200)
+             .json(updatedUser);
+          })
+          .catch(err => {
+            res.status(500).json(err);
+          })
+    });
+
+
+    // GET '/api/player/:player'
+      // Displays other Users Profile   
     router.get('/:player', (req, res, next) => {
       const { player } = req.params;
       console.log(player);
@@ -56,10 +105,8 @@ const {
                    .json(err);
               });
     
-    })
+    });
 
 
-    // GET '/api/player/:name/scores'
-    
 
     module.exports = router;

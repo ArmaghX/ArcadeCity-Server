@@ -11,10 +11,7 @@ const playerSchema = new Schema({
   listedArcades: [{type: Schema.Types.ObjectId, ref:"Arcade"}],
   rankings: [{type: Schema.Types.ObjectId, ref:"HighestScore"}]
 }, {
-  timestamps: {
-    createdAt: 'created_at',
-    updatedAt: 'updated_at'
-  },
+  timestamps: true
 });
 
 
