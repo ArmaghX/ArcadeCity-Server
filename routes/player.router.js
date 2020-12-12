@@ -4,8 +4,7 @@ const mongoose = require('mongoose');
 const createError = require("http-errors");
 
 const Player = require("../models/player.model");
-const Arcade = require("../models/arcade.model");
-const HighestScore = require("../models/highestScore.model");
+
 
 // HELPER FUNCTIONS
 const {
