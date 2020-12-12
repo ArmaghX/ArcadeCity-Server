@@ -71,7 +71,7 @@ const {
            .json({ message: 'Invalid Session: id not found' });
           return;
         }
-        User.findByIdAndUpdate(id, { avatarImg }, {new: true})
+        Player.findByIdAndUpdate(id, { avatarImg }, {new: true})
           .then((updatedUser) => {
             res
              .status(200)
