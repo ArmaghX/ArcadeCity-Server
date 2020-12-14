@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const createError = require("http-errors");
+const queryString = require('query-string');
 
 const Player = require("../models/player.model");
 const Arcade = require("../models/arcade.model");
@@ -19,20 +20,44 @@ const {
 
     // GET '/api/arcades?filters'
         // Gets all Arcades or filtered ones
-    router.get('/', (req, res, next) => {
-        console.log(req.query)
-        const { city, game, isEmulated } = req.query;
-        const searchQuery = {}
+    // router.get('/:city/:game/:isemulated', (req, res, next) => {
+    //     console.log(req.params)
+    //     const { city, game, isEmulated } = req.params;
+    //     const searchQuery = {}
 
-        if (city) searchQuery.city = city.toLowerCase();
-        if (game) searchQuery.game = game.toLowerCase();
-        if (isEmulated) searchQuery.isEmulated = isEmulated;
+    //     if (city) searchQuery.city = city.toLowerCase();
+    //     if (game) searchQuery.game = game.toLowerCase();
+    //     if (isEmulated) searchQuery.isEmulated = isEmulated;
 
-        Arcade.find(searchQuery) // NOT A FUNCTION
-            .then((foundArcades) => {
+    //     Arcade.find(searchQuery) // NOT A FUNCTION
+    //         .then((foundArcades) => {
+    //             res
+    //             .status(201)
+    //             .json(foundArcades);
+    //         })
+    //         .catch((err) => {
+    //             res
+    //             .status(500)
+    //             .json(err);
+    //         });
+    // });
+
+    router.get('/search/:city', (req, res, next) => {
+        // const parsed = queryString.parse(this.props.location.search)
+        // console.log(parsed)
+        const  city  = req.params.city;
+        const searchParams = {}
+
+        if (city) searchParams.city = city.toLowerCase();
+        // if (game) searchParams.game = game.toLowerCase();
+        // if (isEmulated) searchParams.isEmulated = isEmulated;
+        console.log('CITY GOES HERE', city);
+        Arcade.find({city}) // NOT A FUNCTION
+            .then((response) => {
+                console.log(response);
                 res
                 .status(201)
-                .json(foundArcades);
+                .json(response);
             })
             .catch((err) => {
                 res
@@ -41,13 +66,15 @@ const {
             });
     });
 
-
     // POST '/api/arcades'
         // Creates new Arcade
     router.post('/', isLoggedIn, (req, res, next) => {
         const currentUserId = req.session.currentUser._id;
 
         console.log(currentUserId)
+
+        const city = req.body.city.toLowerCase();
+        
         const {
             game,
             description,
@@ -57,14 +84,15 @@ const {
             isActive,
             coins,
             yearReleased,
+            highestScores,
             gallery,
             hunterId,
             coordinates,
             contactInfo,
             address,
-            city,
             comments
         } = req.body;
+
 
         Arcade.create({
             game,
@@ -86,7 +114,7 @@ const {
         })
         .then((newArcade) => {
             Player.findByIdAndUpdate(
-                hunterId,
+                currentUserId,
                 { 
                     $push:{ listedArcades: newArcade._id },
                     $set:{ hasFound: true }
@@ -136,7 +164,7 @@ const {
                     }})
               .then((foundArcade) => {
                   console.log(foundArcade)
-                // foundArcade.scoredBy.password = "***";
+                  foundArcade.hunterId.password = "***";
                   res
                    .status(200)
                    .json(foundArcade);

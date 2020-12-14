@@ -34,7 +34,7 @@ app.use(
   cors({
     credentials: true,
     origin: [
-      'process.env.PUBLIC_DOMAIN',
+      'http://localhost:3000',
       'http://arcade-city.herokuapp.com/',
       'https://arcade-city.herokuapp.com/'
     ],
