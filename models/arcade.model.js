@@ -14,7 +14,7 @@ const arcadeSchema = new Schema({
     coins: Number,
     yearReleased: Number,
     highestScores: [{type: Schema.Types.ObjectId, ref:"HighestScore"}],
-    gallery: [{type: String, required: true}],
+    gallery: {type: String, required: true},
     hunterId: {type: Schema.Types.ObjectId, ref:"Player"},
     coordinates: [{type: Number}],
     contactInfo: String,

@@ -18,9 +18,9 @@ const {
     // GET '/api/player/me'       // WORKING
       // Gets Current User Information (with Favs, ListedArcades and Rankings/Scores)
     router.get('/me', isLoggedIn, (req, res, next) => {
-        const currentUserSessionData = req.session.currentUser;
+        const id = req.session.currentUser._id;
 
-      Player.findById(currentUserSessionData)
+      Player.findById(id)
             .populate('listedArcades')
             .populate('rankings')
             .populate('favourites')

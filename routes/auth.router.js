@@ -57,21 +57,23 @@ router.post('/signup', isNotLoggedIn, validationLogin, (req, res, next) => {
 
 // POST '/auth/login'
 router.post('/login', isNotLoggedIn, validationLogin, (req, res, next) => {
-  const { player, email, password } = req.body;
+  const { email, password } = req.body;
 
-  Player.findOne( {$or:[{player}, {email}]} )
+ 
+    Player.findOne( {email} )
     .then( (user) => {
       if (! user) {
         // If user with that username can't be found, respond with an error
         return next( createError(404)  );  // Not Found
       }
-
+      console.log(user);
       const passwordIsValid = bcrypt.compareSync(password, user.password); //  true/false
 
       if (passwordIsValid) {
         // set the `req.session.currentUser`, to trigger creation of the session
         user.password = "***";
         req.session.currentUser = user;
+        // console.log('object :>> ', req.session.currentUser);
 
         res
           .status(200)

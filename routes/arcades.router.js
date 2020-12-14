@@ -45,8 +45,9 @@ const {
     // POST '/api/arcades'
         // Creates new Arcade
     router.post('/', isLoggedIn, (req, res, next) => {
-        const currentUserId = req.session.currentUser._id.toString();
+        const currentUserId = req.session.currentUser._id;
 
+        console.log(currentUserId)
         const {
             game,
             description,
@@ -75,8 +76,8 @@ const {
             coins,
             yearReleased,
             highestScores: [],
-            gallery: [],
-            hunterId,
+            gallery,
+            hunterId: currentUserId,
             coordinates: [],
             contactInfo,
             address,
@@ -85,7 +86,7 @@ const {
         })
         .then((newArcade) => {
             Player.findByIdAndUpdate(
-                currentUserId,
+                hunterId,
                 { 
                     $push:{ listedArcades: newArcade._id },
                     $set:{ hasFound: true }
