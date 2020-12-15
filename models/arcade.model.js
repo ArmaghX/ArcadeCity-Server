@@ -16,7 +16,12 @@ const arcadeSchema = new Schema({
     highestScores: [{type: Schema.Types.ObjectId, ref:"HighestScore"}],
     gallery: {type: String, required: true},
     hunterId: {type: Schema.Types.ObjectId, ref:"Player"},
-    coordinates: [{type: Number}],
+    location: {
+        type: {
+          type: String
+        },
+        coordinates: [Number]
+      },
     contactInfo: String,
     address: String,
     city: String,
@@ -26,6 +31,8 @@ const arcadeSchema = new Schema({
 }, {
     timestamps: true,
 });
+
+arcadeSchema.index({ location: '2dsphere' });
 
 const Arcade = mongoose.model('Arcade', arcadeSchema);
 

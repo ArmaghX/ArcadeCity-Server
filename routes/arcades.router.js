@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const createError = require("http-errors");
 const queryString = require('query-string');
 
+const uploader = require("./../config/cloudinary-setup");
+
 const Player = require("../models/player.model");
 const Arcade = require("../models/arcade.model");
 const HighestScore = require("../models/highestScore.model");
@@ -17,31 +19,22 @@ const {
   } = require("../helpers/middlewares");
 
 
+    // CLOUDINARY: upload a single image per once.
+    // ADD an horitzontal middleware
+    router.post("/upload", uploader.single("gallery"), (req, res, next) => {
+        console.log("file is: ", req.file);
+    
+        if (!req.file) {
+        next(new Error("No file uploaded!"));
+        return;
+        }
+        // get secure_url from the file object and save it in the
+        // variable 'secure_url', but this can be any name, just make sure you remember to use the same in frontend
+        res.json({ secure_url: req.file.secure_url });
+    });
 
-    // GET '/api/arcades?filters'
-        // Gets all Arcades or filtered ones
-    // router.get('/:city/:game/:isemulated', (req, res, next) => {
-    //     console.log(req.params)
-    //     const { city, game, isEmulated } = req.params;
-    //     const searchQuery = {}
-
-    //     if (city) searchQuery.city = city.toLowerCase();
-    //     if (game) searchQuery.game = game.toLowerCase();
-    //     if (isEmulated) searchQuery.isEmulated = isEmulated;
-
-    //     Arcade.find(searchQuery) // NOT A FUNCTION
-    //         .then((foundArcades) => {
-    //             res
-    //             .status(201)
-    //             .json(foundArcades);
-    //         })
-    //         .catch((err) => {
-    //             res
-    //             .status(500)
-    //             .json(err);
-    //         });
-    // });
-
+    // GET '/api/arcades/search/:city'
+        // 
     router.get('/search/:city', (req, res, next) => {
         // const parsed = queryString.parse(this.props.location.search)
         // console.log(parsed)
@@ -52,7 +45,8 @@ const {
         // if (game) searchParams.game = game.toLowerCase();
         // if (isEmulated) searchParams.isEmulated = isEmulated;
         console.log('CITY GOES HERE', city);
-        Arcade.find({city}) // NOT A FUNCTION
+        const regex = new RegExp(["^", city, "$"].join(""), "i") //   /^Paris$/i
+        Arcade.find({city: regex }) // NOT A FUNCTION
             .then((response) => {
                 console.log(response);
                 res
@@ -69,12 +63,11 @@ const {
     // POST '/api/arcades'
         // Creates new Arcade
     router.post('/', isLoggedIn, (req, res, next) => {
+        console.log('THIS IS THE REQ.BODY', req.body);
         const currentUserId = req.session.currentUser._id;
 
-        console.log(currentUserId)
+        const coins = Number(req.body.coins);
 
-        const city = req.body.city.toLowerCase();
-        
         const {
             game,
             description,
@@ -82,14 +75,14 @@ const {
             isEmulated,
             rating,
             isActive,
-            coins,
             yearReleased,
             highestScores,
             gallery,
-            hunterId,
             coordinates,
+            hunterId,
             contactInfo,
             address,
+            city,
             comments
         } = req.body;
 
@@ -106,7 +99,10 @@ const {
             highestScores: [],
             gallery,
             hunterId: currentUserId,
-            coordinates: [],
+            location: {
+                coordinates: coordinates,
+                type: "Point"
+            },
             contactInfo,
             address,
             city,
