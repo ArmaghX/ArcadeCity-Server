@@ -47,6 +47,7 @@ const {
         console.log('CITY GOES HERE', city);
         const regex = new RegExp(["^", city, "$"].join(""), "i") //   /^Paris$/i
         Arcade.find({city: regex }) // NOT A FUNCTION
+            .populate('highestScores hunterId')
             .then((response) => {
                 console.log(response);
                 res

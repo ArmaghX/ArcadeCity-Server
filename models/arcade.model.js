@@ -23,8 +23,8 @@ const arcadeSchema = new Schema({
         coordinates: [Number]
       },
     contactInfo: String,
-    address: String,
-    city: String,
+    address: {type: String, required: true},
+    city: {type: String, required: true},
     comments: [ 
         commentSchema
      ]
