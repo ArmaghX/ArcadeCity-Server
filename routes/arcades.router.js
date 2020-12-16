@@ -123,13 +123,16 @@ const {
 
                 res
                  .status(201)
-                 .json(updatedPlayer);
             })
             .catch((err) => {
                 res
                  .status(500)
                  .json(err);
             });
+
+            res
+             .status(201)
+             .json(newArcade);
         })
         .catch((err) => {
             res
