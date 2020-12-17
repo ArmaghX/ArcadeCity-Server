@@ -35,8 +35,8 @@ app.use(
     credentials: true,
     origin: [
       'http://localhost:3000',
-      'http://arcade-city.herokuapp.com/',
-      'https://arcade-city.herokuapp.com/'
+      'http://arcade-city.herokuapp.com',
+      'https://arcade-city.herokuapp.com'
     ],
   }),
 );

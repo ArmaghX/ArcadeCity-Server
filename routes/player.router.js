@@ -6,6 +6,7 @@ const createError = require("http-errors");
 const uploader = require("./../config/cloudinary-setup");
 
 const Player = require("../models/player.model");
+const Arcade = require("../models/arcade.model");
 
 
 // HELPER FUNCTIONS
@@ -77,7 +78,7 @@ const {
 
     // PUT '/api/player/me/'
       // Updates Current User Profile
-      router.put('/me', isLoggedIn, (req, res, next)=>{
+      router.put('/me', isLoggedIn, (req, res, next) => {
         const id = req.session.currentUser._id;
         const { avatarImg } = req.body;
 
@@ -98,6 +99,68 @@ const {
           })
     });
 
+    // PUT '/api/player/favourites/:id'
+      // Updates Current User Favourites List
+      router.put('/favourites/:id', isLoggedIn, (req, res, next) => {
+        const  newFavouriteArcadeId  = req.params.id;
+        const id = req.session.currentUser._id;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+          res
+           .status(400)
+           .json({ message: 'Invalid Session: id not found' });
+          return;
+        }
+        
+        Player.findByIdAndUpdate(
+          id,
+          { 
+              $push:{ favourites: newFavouriteArcadeId },
+              $set:{ hasFound: true }
+          },
+          {new: true}
+          )
+          .then((updatedUser) => {
+            res
+             .status(200)
+             .json(updatedUser);
+          })
+          .catch(err => {
+            res.status(500).json(err);
+          })
+      })
+
+    // DELETE '/api/player/favourites/:id'
+      // Updates Current User Favourites List by deleting fav entry
+
+      router.post('/favourites/:id', isLoggedIn, (req, res, next) => {
+        const  deleteFavouriteArcadeId  = req.params.id;
+        const id = req.session.currentUser._id;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+          res
+           .status(400)
+           .json({ message: 'Invalid Session: id not found' });
+          return;
+        }
+        
+        Player.findByIdAndUpdate(
+          id,
+          { 
+              $pull:{ favourites: deleteFavouriteArcadeId },
+              $set:{ hasFound: true }
+          },
+          {new: true}
+          )
+          .then((updatedUser) => {
+            res
+             .status(200)
+             .json(updatedUser);
+          })
+          .catch(err => {
+            res.status(500).json(err);
+          })
+      })
 
     // GET '/api/player/:player'
       // Displays other Users Profile   
