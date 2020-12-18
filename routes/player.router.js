@@ -20,7 +20,7 @@ const {
     // include CLOUDINARY: upload a single image per once.
     // ADD an horitzontal middleware
     router.post("/upload", uploader.single("avatarImg"), (req, res, next) => {
-      console.log("file is: ", req.file);
+      // console.log("file is: ", req.file);
   
       if (!req.file) {
       next(new Error("No file uploaded!"));
@@ -166,7 +166,6 @@ const {
       // Displays other Users Profile   
     router.get('/:player', (req, res, next) => {
       const { player } = req.params;
-      console.log(player);
 
       Player.findOne({player})
               .populate('favourites')

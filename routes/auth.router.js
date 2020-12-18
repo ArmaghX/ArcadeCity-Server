@@ -66,7 +66,6 @@ router.post('/login', isNotLoggedIn, validationLogin, (req, res, next) => {
         // If user with that username can't be found, respond with an error
         return next( createError(404)  );  // Not Found
       }
-      console.log(user);
       const passwordIsValid = bcrypt.compareSync(password, user.password); //  true/false
 
       if (passwordIsValid) {

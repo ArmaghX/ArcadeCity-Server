@@ -83,54 +83,21 @@
 
 
 - HomePage
-  - Basic Search Form
-  - Nearby Arcades *(Geolocation only)*
-  - About
-  - Navbar *(Collapsible)*
-    - Signup
-    - Login
-    - ProfilePic
-    - Player 2  ***(Backlog Feature)***
-    - Profile
-    - ListArcades
-    - Favourites
-    - My Tournaments  ***(Backlog Feature)***
 - SearchPage
-  - Search Form
-  - GameCard
-  - Mapbox
 - ArcadeDetailsPage
-  - Gallery
-  - Description
-  - Rankings
-  - AddFav
-  - Tournament Info  ***(Backlog Feature)***
 - SignupPage
-  - Signup Form
 - LoginPage
-  - Login Form
 - ProfilePage
-  - Description
-  - Contact Info
-  - Add Player 2  ***(Backlog Feature)***
 - EditProfilePage
-  - DeleteProfile
 - ListArcadesPage
-  - NewArcade
-  - EditArcade
 - EditArcadesPage
-  - DeleteArcade
 - FavouritesPage
 - AboutPage
 - PlayerTwoPage  ***(Backlog Feature)***
-  - Search Players
-  - Followers
-  - Following
 
 - MyTournamentsPage  ***(Backlog Feature)***
-  - TournamentCard
-  - TournamentDetails
-  - CancelEntry
+
+  
 
 
 
@@ -142,7 +109,7 @@
 
   
 
-- Arcade Service
+- Api Service
 
   
 
@@ -164,8 +131,8 @@
 
 ```User {
 {
-     "player": { type: String, required: true},
-     "email": {type: String, required: true},
+     "player": { type: String, required: true, unique: true },
+     "email": { type: String, require: true, unique: true },
      "password": {type: String, required: true},
      "avatarImg": String,
      "favourites": [{type: Schema.Types.ObjectId, ref:"Arcade"}],
@@ -181,7 +148,7 @@
 
 ```
 {	
-	  "game": {type: String, required: true},
+	"game": {type: String, required: true},
     "description": String,
     "maxPlayers": Number,
     "isEmulated": Boolean,
@@ -190,27 +157,33 @@
     "coins": Number,
     "yearReleased": Number,
     "highestScores": [{type: Schema.Types.ObjectId, ref:"HighestScore"}],
-    "gallery": [{type: String, required: true}],
+    "gallery": {type: String, required: true},
     "hunterId": {type: Schema.Types.ObjectId, ref:"Player"},
-    "coordinates": [{type: Number}],
+    "location": {
+        type: {
+          type: String
+        },
+        coordinates: [Number]
+      },
     "contactInfo": String,
-    "address": String,
-    "city": String,
-    "comments": [
-        commentSchema
-    ]
+    "address": {type: String, required: true},
+    "city": {type: String, required: true},
+    "comments": [{
+    		"type": String,
+    		"commentBy": {type: Schema.Types.ObjectId, ref:"Player"}
+    		}]
 }
 ```
 
 
 
-**HighestScore Model**
+HighestScore Model
 
 ```
 { 
  	"score": {type:Number, default: 0},
  	"arcade": {type: Schema.Types.ObjectId, ref:"Arcade"},
-  "scoredBy": {type: Schema.Types.ObjectId, ref:"Player"}
+    "scoredBy": {type: Schema.Types.ObjectId, ref:"Player"}
 }
 ```
 
@@ -220,21 +193,21 @@
 
 
 
-| HTTP Method | URL                                          | Request Body              | Success status | Error Status | Description                                                  |
-| ----------- | -------------------------------------------- | ------------------------- | -------------- | ------------ | ------------------------------------------------------------ |
-| POST        | `/auth/signup`                               | {player, email, password} | 201            | 404          | Checks if fields are not empty (422) and user not exists (409), then create user with encrypted password, and store user in session |
-| POST        | `/auth/login`                                | {email, password}         | 200            | 401          | Checks if fields not empty (422), if user exists (404), and if password matches (404), then stores user in session |
-| GET         | `/auth/logout`                               | Saved session             | 204            | 400          | Check if user is logged in and logs out the user             |
-| GET         | `/auth/me`                                   | Saved session             | 200            | 404          | Check if user is logged in and return profile page. By React App to set the auth state |
-| GET         | `/auth/favourites`                           | Saved session             | 200            | 404          | Check if user is logged in and return favourites page        |
-| DELETE      | `/auth/user`                                 |                           | 204            |              | Delete profile of the currently logged in user               |
-| GET         | `/api/arcades?city=Str`                      |                           | 200            | 404          | Returns arcades by search query                              |
-| GET         | `/api/arcades?city=Str&game=Str&emulation=0` |                           | 200            | 404          | Returns arcades by search query                              |
-| POST        | `/api/arcades`                               | Arcade model              | 200            | 401          | Create an Arcade Entry                                       |
-| GET         | `/api/arcades/:id`                           |                           | 200            | 400          | Show an specific arcade                                      |
-| DELETE      | `/api/arcades/:id`                           | {id}                      | 204            |              | Delete listed arcade of the currently logged in user         |
-| PUT         | `/api/arcades/:id/comments`                  | {comments}                | 200            | 400          | Add comments                                                 |
-| PUT         | `/api/higuest-scores/:id/`                   | {score, arcade}           | 200            | 400          | Add new highest score                                        |
+| HTTP Method | URL                                | Request Body              | Success status | Error Status | Description                                                  |
+| ----------- | ---------------------------------- | ------------------------- | -------------- | ------------ | ------------------------------------------------------------ |
+| POST        | `/auth/signup`                     | {player, email, password} | 201            | 404          | Checks if fields are not empty (422) and user not exists (409), then create user with encrypted password, and store user in session |
+| POST        | `/auth/login`                      | {email, password}         | 200            | 401          | Checks if fields not empty (422), if user exists (404), and if password matches (404), then stores user in session |
+| GET         | `/auth/logout`                     | Saved session             | 204            | 400          | Check if user is logged in and logs out the user             |
+| GET         | `/api/player/me`                   | Saved session             | 200            | 404          | Check if user is logged in and return profile page. By React App to set the auth state |
+| PUT         | `/api/player/me`                   | {avatarImg}               | 200            | 400          | Check if user is logged in and update profile picture.       |
+| PUT         | `/api/player/favourites`           | Saved session             | 200            | 400          | Check if user is logged in and add arcade to favourites      |
+| POST        | `/api/player/favourites`           | Saved session             | 200            | 400          | Check if user is logged in and remove arcade from favourites |
+| GET         | `/api/arcades/search/:city`        | {req.params}              | 200            | 404          | Returns arcades by search query                              |
+| POST        | `/api/arcades`                     | Arcade model              | 200            | 401          | Create an Arcade Entry                                       |
+| GET         | `/api/arcades/:id`                 | {id}                      | 200            | 400          | Show an specific arcade                                      |
+| DELETE      | `/api/arcades/:id`                 | {id}                      | 204            | 400          | Delete listed arcade of the currently logged in user         |
+| PUT         | `/api/arcades/:id/comments`        | {comments}                | 200            | 400          | Add comments                                                 |
+| PUT         | `/api/arcades/:id/highest-scores/` | {score, arcade}           | 200            | 400          | Add new highest score                                        |
 
 
 
@@ -252,14 +225,14 @@
 
 The url to the repository and to the deployed project
 
-[Client repository Link](https://github.com/screeeen/project-client)
+[Client repository Link](https://github.com/ArmaghX930/ArcadeCity-Client)
 
-[Server repository Link](https://github.com/screeeen/project-server)
+[Server repository Link](https://github.com/ArmaghX930/ArcadeCity-Server)
 
-[Deployed App Link](http://heroku.com/)
+[Deployed App Link](https://arcade-city.herokuapp.com/)
 
 ### Slides
 
 The url to your presentation slides
 
-[Slides Link](http://slides.com/)
+[Slides Link](https://docs.google.com/presentation/d/1y3e_2pzePzha55c3NGjmt9uP5dnz17JV5IH9UX0z6Jo/edit#slide=id.p)

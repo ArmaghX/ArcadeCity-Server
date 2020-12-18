@@ -36,17 +36,14 @@ const {
     // GET '/api/arcades/search/:city'
         // 
     router.get('/search/:city', (req, res, next) => {
-        // const parsed = queryString.parse(this.props.location.search)
-        // console.log(parsed)
+
         const  city  = req.params.city;
         const searchParams = {}
 
         if (city) searchParams.city = city.toLowerCase();
-        // if (game) searchParams.game = game.toLowerCase();
-        // if (isEmulated) searchParams.isEmulated = isEmulated;
-        console.log('CITY GOES HERE', city);
+
         const regex = new RegExp(["^", city, "$"].join(""), "i") //   /^Paris$/i
-        Arcade.find({city: regex }) // NOT A FUNCTION
+        Arcade.find({city: regex })
             .populate('highestScores hunterId')
             .then((response) => {
                 console.log(response);
@@ -64,7 +61,6 @@ const {
     // POST '/api/arcades'
         // Creates new Arcade
     router.post('/', isLoggedIn, (req, res, next) => {
-        console.log('THIS IS THE REQ.BODY', req.body);
         const currentUserId = req.session.currentUser._id;
 
         const coins = Number(req.body.coins);
@@ -163,7 +159,6 @@ const {
                        path: 'scoredBy' 
                     }})
               .then((foundArcade) => {
-                  console.log(foundArcade)
                   foundArcade.hunterId.password = "***";
                   res
                    .status(200)
@@ -298,7 +293,6 @@ const {
                         comment, 
                         commentBy: currentUserId
                             }
-        console.log(newComment)
         if (!mongoose.Types.ObjectId.isValid(id)) {
             res
              .status(400)
